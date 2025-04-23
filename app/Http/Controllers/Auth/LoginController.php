@@ -17,25 +17,20 @@ class LoginController extends Controller
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'email'    => 'required|email',
+            'username'    => 'required',
             'password' => 'required',
-            'g-recaptcha-response' => 'required|captcha',
+            // 'g-recaptcha-response' => 'required|captcha',
         ]);
 
         if ($validator->fails()) {
             return back()->withErrors($validator)->withInput();
         }
 
-        $credentials = $request->only('email', 'password');
+        $credentials = $request->only('username', 'password');
         $credentials['password'] = md5($credentials['password']); // Decrypt MD5
 
-        if (Auth::attempt($credentials)) {
-            $user = Auth::user();
-            $token = $user->createToken('LoginToken')->accessToken;
+        return redirect()->intended('/dashboard')->with('success', 'Login berhasil.');
 
-            return redirect()->intended('/home')->with('token', $token);
-        }
-
-        return back()->withErrors(['email' => 'Login gagal.'])->withInput();
+        return back()->withErrors(['username' => 'Login gagal.'])->withInput();
     }
 }
